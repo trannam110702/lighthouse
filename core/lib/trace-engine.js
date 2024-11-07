@@ -1,4 +1,4 @@
-import * as TraceEngine from '../../packages/trace_engine';
+import * as TraceEngine from '../../packages/trace_engine/index.js';
 
 import {polyfillDOMRect} from './polyfill-dom-rect.js';
 
