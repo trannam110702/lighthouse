@@ -102,8 +102,7 @@
     "core/test/network-records-to-devtools-log-test.js",
     "core/test/runner-test.js",
     "core/test/scoring-test.js",
-    "core/test/scripts/i18n/bake-ctc-to-lhl-test.js",
-    "packages"
+    "core/test/scripts/i18n/bake-ctc-to-lhl-test.js"
   ],
   "files": [
     // Opt-in to typechecking for some core tests and test-support files.
