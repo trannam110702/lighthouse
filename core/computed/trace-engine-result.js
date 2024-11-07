@@ -8,7 +8,6 @@ import * as TraceEngine from '../lib/trace-engine.js';
 import {makeComputedArtifact} from './computed-artifact.js';
 import {CumulativeLayoutShift} from './metrics/cumulative-layout-shift.js';
 import {ProcessedTrace} from './processed-trace.js';
-import * as LH from '../../types/lh.js';
 
 /**
  * @fileoverview Processes trace with the shared trace engine.
@@ -30,9 +29,9 @@ class TraceEngineResult {
     const processor = new TraceEngine.TraceProcessor(traceHandlers);
 
     // eslint-disable-next-line max-len
-    await processor.parse(/** @type {import('@paulirish/trace_engine').Types.TraceEvents.TraceEventData[]} */ (
-      traceEvents
-    ));
+    await processor.parse(
+      /** @type {import('../../packages/trace_engine').Types.TraceEvents.TraceEventData[]} */ (traceEvents)
+    );
     if (!processor.traceParsedData) throw new Error('No data');
     if (!processor.insights) throw new Error('No insights');
     return {data: processor.traceParsedData, insights: processor.insights};
@@ -51,7 +50,8 @@ class TraceEngineResult {
     // The trace events are copied-on-write, so the original trace remains unmodified.
     const processedTrace = await ProcessedTrace.request(data.trace, context);
     const layoutShiftEvents = new Set(
-      CumulativeLayoutShift.getLayoutShiftEvents(processedTrace).map(e => e.event));
+      CumulativeLayoutShift.getLayoutShiftEvents(processedTrace).map(e => e.event)
+    );
 
     // Avoid modifying the input array.
     const traceEvents = [...data.trace.traceEvents];

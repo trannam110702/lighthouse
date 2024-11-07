@@ -16,7 +16,7 @@ class RootCauses extends BaseGatherer {
   meta = {
     symbol: RootCauses.symbol,
     supportedModes: ['timespan', 'navigation'],
-    dependencies: {Trace: Trace.symbol},
+    dependencies: {Trace: Trace.symbol}
   };
 
   /**
@@ -32,23 +32,24 @@ class RootCauses extends BaseGatherer {
     // nodeIds if the DOM domain was enabled before this gatherer, invoke it to be safe.
     await driver.defaultSession.sendCommand('DOM.getDocument', {depth: -1, pierce: true});
 
-    /** @type {import('@paulirish/trace_engine').RootCauses.RootCauses.RootCauseProtocolInterface} */
+    /** @type {import('../../../packages/trace_engine').RootCauses.RootCauses.RootCauseProtocolInterface} */
     const protocolInterface = {
       /** @param {string} url */
       // eslint-disable-next-line no-unused-vars
       getInitiatorForRequest(url) {
         return null;
       },
-      /** @param {import('@paulirish/trace_engine/generated/protocol.js').DOM.BackendNodeId[]} backendNodeIds */
+      /** @param {import('../../../packages/trace_engine/generated/protocol.js').DOM.BackendNodeId[]} backendNodeIds */
       async pushNodesByBackendIdsToFrontend(backendNodeIds) {
         const response = await driver.defaultSession.sendCommand(
-          'DOM.pushNodesByBackendIdsToFrontend', {backendNodeIds});
+          'DOM.pushNodesByBackendIdsToFrontend',
+          {backendNodeIds}
+        );
         const nodeIds =
-          /** @type {import('@paulirish/trace_engine/generated/protocol.js').DOM.NodeId[]} */(
-            response.nodeIds);
+          /** @type {import('../../../packages/trace_engine/generated/protocol.js').DOM.NodeId[]} */ (response.nodeIds);
         return nodeIds;
       },
-      /** @param {import('@paulirish/trace_engine/generated/protocol.js').DOM.NodeId} nodeId */
+      /** @param {import('../../../packages/trace_engine/generated/protocol.js').DOM.NodeId} nodeId */
       async getNode(nodeId) {
         try {
           const response = await driver.defaultSession.sendCommand('DOM.describeNode', {nodeId});
@@ -56,8 +57,7 @@ class RootCauses extends BaseGatherer {
           // https://bugs.chromium.org/p/chromium/issues/detail?id=1515175
           response.node.nodeId = nodeId;
           const node =
-            /** @type {import('@paulirish/trace_engine/generated/protocol.js').DOM.Node} */(
-              response.node);
+            /** @type {import('../../../packages/trace_engine/generated/protocol.js').DOM.Node} */ (response.node);
           return node;
         } catch (err) {
           if (err.message.includes('Could not find node with given id')) {
@@ -72,7 +72,7 @@ class RootCauses extends BaseGatherer {
             // Note: this could be buggy by giving the wrong node detail if a node id meant for a non-main frame
             // happens to match one from the main frame ... which is pretty likely...
             // TODO: fix trace engine type to allow returning null.
-            return /** @type {any} */(null);
+            return /** @type {any} */ (null);
           }
           throw err;
         }
@@ -80,23 +80,30 @@ class RootCauses extends BaseGatherer {
       /** @param {number} nodeId */
       async getComputedStyleForNode(nodeId) {
         try {
-          const response = await driver.defaultSession.sendCommand(
-            'CSS.getComputedStyleForNode', {nodeId});
+          const response = await driver.defaultSession.sendCommand('CSS.getComputedStyleForNode', {
+            nodeId
+          });
           return response.computedStyle;
         } catch {
           return [];
         }
       },
-      /** @param {import('@paulirish/trace_engine/generated/protocol.js').DOM.NodeId} nodeId */
+      /** @param {import('../../../packages/trace_engine/generated/protocol.js').DOM.NodeId} nodeId */
       async getMatchedStylesForNode(nodeId) {
         try {
-          const response = await driver.defaultSession.sendCommand(
-            'CSS.getMatchedStylesForNode', {nodeId});
-          return {...response, getError() {}};
+          const response = await driver.defaultSession.sendCommand('CSS.getMatchedStylesForNode', {
+            nodeId
+          });
+          return {
+            ...response,
+            getError() {}
+          };
         } catch (err) {
-          return /** @type {any} */({getError() {
-            return err.toString();
-          }});
+          return /** @type {any} */ ({
+            getError() {
+              return err.toString();
+            }
+          });
         }
       },
       /** @param {string} url */
@@ -104,13 +111,14 @@ class RootCauses extends BaseGatherer {
       // eslint-disable-next-line no-unused-vars
       async fontFaceForSource(url) {
         return null;
-      },
+      }
     };
 
     /** @type {LH.Artifacts.TraceEngineRootCauses} */
     const rootCauses = {
-      layoutShifts: {},
+      layoutShifts: {}
     };
+    // @ts-ignore
     const rootCausesEngine = new TraceEngine.RootCauses(protocolInterface);
     const layoutShiftEvents = traceParsedData.LayoutShifts.clusters.flatMap(c => c.events);
     for (const event of layoutShiftEvents) {

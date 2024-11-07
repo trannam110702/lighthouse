@@ -5,9 +5,10 @@
  */
 
 import {Protocol as Crdp} from 'devtools-protocol/types/protocol.js';
-import * as TraceEngine from '@paulirish/trace_engine';
+// @ts-ignore
+import * as TraceEngine from '../packages/trace_engine';
 import * as Lantern from '../core/lib/lantern/lantern.js';
-import {LayoutShiftRootCausesData} from '@paulirish/trace_engine/models/trace/root-causes/LayoutShift.js';
+import {LayoutShiftRootCausesData} from '../packages/trace_engine/models/trace/root-causes/LayoutShift.js';
 
 import {parseManifest} from '../core/lib/manifest-parser.js';
 import {LighthouseError} from '../core/lib/lh-error.js';

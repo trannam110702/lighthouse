@@ -45,9 +45,11 @@ class CumulativeLayoutShift {
     }
 
     for (const event of processedTrace.frameTreeEvents) {
-      if (event.name !== 'LayoutShift' ||
-          !event.args.data ||
-          event.args.data.is_main_frame === undefined) {
+      if (
+        event.name !== 'LayoutShift' ||
+        !event.args.data ||
+        event.args.data.is_main_frame === undefined
+      ) {
         continue;
       }
 
@@ -69,7 +71,7 @@ class CumulativeLayoutShift {
         isMainFrame: event.args.data.is_main_frame,
         weightedScore: event.args.data.weighted_score_delta,
         impactedNodes: event.args.data.impacted_nodes,
-        event,
+        event
       });
     }
 
@@ -101,7 +103,8 @@ class CumulativeLayoutShift {
 
         const oldRect = RectHelpers.traceRectToLHRect(node.old_rect);
         const newRect = RectHelpers.traceRectToLHRect(node.new_rect);
-        const areaOfImpact = RectHelpers.getRectArea(oldRect) +
+        const areaOfImpact =
+          RectHelpers.getRectArea(oldRect) +
           RectHelpers.getRectArea(newRect) -
           RectHelpers.getRectOverlapArea(oldRect, newRect);
 
@@ -154,15 +157,15 @@ class CumulativeLayoutShift {
    */
   static async computeWithSharedTraceEngine(allFrameShiftEvents, mainFrameShiftEvents) {
     /** @param {LH.TraceEvent[]} events */
-    const run = async (events) => {
+    const run = async events => {
       const processor = new TraceEngine.TraceProcessor({
         LayoutShifts: TraceEngine.TraceHandlers.LayoutShifts,
-        Screenshots: TraceEngine.TraceHandlers.Screenshots,
+        Screenshots: TraceEngine.TraceHandlers.Screenshots
       });
       // eslint-disable-next-line max-len
-      await processor.parse(/** @type {import('@paulirish/trace_engine').Types.TraceEvents.TraceEventData[]} */ (
-        events
-      ));
+      await processor.parse(
+        /** @type {import('../../../packages/trace_engine').Types.TraceEvents.TraceEventData[]} */ (events)
+      );
       if (!processor.traceParsedData) {
         throw new Error('null trace engine result');
       }
@@ -181,8 +184,7 @@ class CumulativeLayoutShift {
   static async compute_(trace, context) {
     const processedTrace = await ProcessedTrace.request(trace, context);
 
-    const allFrameShiftEvents =
-        CumulativeLayoutShift.getLayoutShiftEvents(processedTrace);
+    const allFrameShiftEvents = CumulativeLayoutShift.getLayoutShiftEvents(processedTrace);
     const impactByNodeId = CumulativeLayoutShift.getImpactByNodeId(allFrameShiftEvents);
     const mainFrameShiftEvents = allFrameShiftEvents.filter(e => e.isMainFrame);
     const cumulativeLayoutShift = CumulativeLayoutShift.calculate(allFrameShiftEvents);
@@ -200,8 +202,10 @@ class CumulativeLayoutShift {
     }
     if (tryNewTraceEngine) {
       try {
-        newEngineResult =
-          await this.computeWithSharedTraceEngine(allFrameShiftEvents, mainFrameShiftEvents);
+        newEngineResult = await this.computeWithSharedTraceEngine(
+          allFrameShiftEvents,
+          mainFrameShiftEvents
+        );
         newEngineResultDiffered =
           newEngineResult.cumulativeLayoutShift !== cumulativeLayoutShift ||
           newEngineResult.cumulativeLayoutShiftMainFrame !== cumulativeLayoutShiftMainFrame;
@@ -225,8 +229,8 @@ class CumulativeLayoutShift {
             level: 'error',
             extra: {
               // Not sure if Sentry handles `cause`, so just in case add the info in a second place.
-              errorMsg: err.toString(),
-            },
+              errorMsg: err.toString()
+            }
           });
         }
       }
@@ -237,7 +241,7 @@ class CumulativeLayoutShift {
       cumulativeLayoutShiftMainFrame,
       impactByNodeId,
       newEngineResult,
-      newEngineResultDiffered,
+      newEngineResultDiffered
     };
   }
 }
