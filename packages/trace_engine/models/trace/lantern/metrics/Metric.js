@@ -70,7 +70,7 @@ class Metric {
     const interceptMultiplier = coefficients.intercept > 0 ? Math.min(1, optimisticEstimate.timeInMs / 1000) : 1;
     const timing = coefficients.intercept * interceptMultiplier +
       coefficients.optimistic * optimisticEstimate.timeInMs + coefficients.pessimistic * pessimisticEstimate.timeInMs;
-    const avadaScriptData = metricName === 'TotalBlockingTime' ? this.getTopLevelEvents(pessimisticSimulation.nodeTimings, BLOCKING_TIME_THRESHOLD) : [];
+    const avadaScriptData = metricName === 'TotalBlockingTime' ? this.formatScriptData(this.getTopLevelEvents(pessimisticSimulation.nodeTimings, BLOCKING_TIME_THRESHOLD)) : [];
     return {
       timing,
       avadaScriptData,
@@ -79,6 +79,18 @@ class Metric {
       optimisticGraph,
       pessimisticGraph,
     };
+  }
+
+  static formatScriptData(scriptData) {
+    return scriptData.reduce((acc, script) => {
+      const {evaluateScriptUrls} = script;
+      const formatedScript = {evaluateScriptUrls}
+      formatedScript.blockingTime = script.duration - BLOCKING_TIME_THRESHOLD;
+      if (evaluateScriptUrls.length) {
+        acc.push(formatedScript);
+      }
+      return acc;
+    }, []);
   }
 }
 
