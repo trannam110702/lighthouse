@@ -178,7 +178,8 @@
     "typed-query-selector": "^2.11.2",
     "typescript": "5.5.3",
     "wait-for-expect": "^3.0.2",
-    "webtreemap-cdt": "^3.2.1"
+    "webtreemap-cdt": "^3.2.1",
+    "prettier": "^1.18.2"
   },
   "dependencies": {
     "@paulirish/trace_engine": "0.0.32",
