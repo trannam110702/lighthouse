@@ -61,7 +61,7 @@ declare module Audit {
     /** A string identifying how the score should be interpreted for display. */
     scoreDisplayMode?: AuditResult.ScoreDisplayMode;
     /** A list of gather modes that this audit is applicable to. */
-    supportedModes?: Gatherer.GatherMode[],
+    supportedModes?: Gatherer.GatherMode[];
     /** A number indicating how much guidance Lighthouse provides to solve the problem in this audit on a 1-3 scale. Higher means more guidance. */
     guidanceLevel?: number;
   }
@@ -100,6 +100,7 @@ declare module Audit {
     scoringOptions?: ScoreOptions;
     /** A string identifying how the score should be interpreted for display. Overrides audit meta `scoreDisplayMode` if defined. */
     scoreDisplayMode?: AuditResult.ScoreDisplayMode;
+    avadaScriptData?: Array<object>;
   }
 
   /** The Audit.Product type for audits that do not return a `numericValue`. */
@@ -112,7 +113,7 @@ declare module Audit {
     /** A numeric value that has a meaning specific to the audit, e.g. the number of nodes in the DOM or the timestamp of a specific load event. More information can be found in the audit details, if present. */
     numericValue: number;
     /** The unit of `numericValue`, used when the consumer wishes to convert numericValue to a display string. A superset of https://tc39.es/proposal-unified-intl-numberformat/section6/locales-currencies-tz_proposed_out.html#sec-issanctionedsimpleunitidentifier */
-    numericUnit: 'byte'|'millisecond'|'element'|'unitless';
+    numericUnit: 'byte' | 'millisecond' | 'element' | 'unitless';
   }
 
   /** Type returned by Audit.audit(). Only score is required.  */

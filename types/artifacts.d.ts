@@ -15,7 +15,7 @@ import {NetworkRequest as _NetworkRequest} from '../core/lib/network-request.js'
 import speedline from 'speedline-core';
 import * as CDTSourceMap from '../core/lib/cdt/generated/SourceMap.js';
 import {ArbitraryEqualityMap} from '../core/lib/arbitrary-equality-map.js';
-import type { TaskNode as _TaskNode } from '../core/lib/tracehouse/main-thread-tasks.js';
+import type {TaskNode as _TaskNode} from '../core/lib/tracehouse/main-thread-tasks.js';
 import AuditDetails from './lhr/audit-details.js'
 import Config from './config.js';
 import Gatherer from './gatherer.js';
@@ -50,13 +50,13 @@ interface UniversalBaseArtifacts {
   /** The timing instrumentation of the gather portion of a run. */
   Timing: Artifacts.MeasureEntry[];
   /** Device which Chrome is running on. */
-  HostFormFactor: 'desktop'|'mobile';
+  HostFormFactor: 'desktop' | 'mobile';
   /** The user agent string of the version of Chrome used. */
   HostUserAgent: string;
   /** The product string of the version of Chrome used. Example: HeadlessChrome/123.2.2.0 would be from old headless. */
   HostProduct: string;
   /** Information about how Lighthouse artifacts were gathered. */
-  GatherContext: {gatherMode: Gatherer.GatherMode};
+  GatherContext: { gatherMode: Gatherer.GatherMode };
 }
 
 /**
@@ -86,7 +86,14 @@ interface PublicGathererArtifacts {
   /** The contents of the main HTML document network resource. */
   MainDocumentContent: string;
   /** The values of the <meta> elements in the head. */
-  MetaElements: Array<{name?: string, content?: string, property?: string, httpEquiv?: string, charset?: string, node: Artifacts.NodeDetails}>;
+  MetaElements: Array<{
+    name?: string,
+    content?: string,
+    property?: string,
+    httpEquiv?: string,
+    charset?: string,
+    node: Artifacts.NodeDetails
+  }>;
   /** Information on all scripts in the page. */
   Scripts: Artifacts.Script[];
   /** The primary trace taken over the entire run. */
@@ -113,7 +120,7 @@ export interface GathererArtifacts extends PublicGathererArtifacts {
   /** The log of devtools protocol activity if there was a page load error and Chrome navigated to a `chrome-error://` page. */
   DevtoolsLogError: DevtoolsLog;
   /** Information on the document's doctype(or null if not present), specifically the name, publicId, and systemId.
-      All properties default to an empty string if not present */
+   All properties default to an empty string if not present */
   Doctype: Artifacts.Doctype | null;
   /** Information on the size of all DOM nodes in the page and the most extreme members. */
   DOMStats: Artifacts.DOMStats;
@@ -122,7 +129,7 @@ export interface GathererArtifacts extends PublicGathererArtifacts {
   /** All the iframe elements in the page. */
   IFrameElements: Artifacts.IFrameElement[];
   /** All the input elements, including associated form and label elements. */
-  Inputs: {inputs: Artifacts.InputElement[]; forms: Artifacts.FormElement[]; labels: Artifacts.LabelElement[]};
+  Inputs: { inputs: Artifacts.InputElement[]; forms: Artifacts.FormElement[]; labels: Artifacts.LabelElement[] };
   /** Screenshot of the entire page (rather than just the above the fold content). */
   FullPageScreenshot: LHResult.FullPageScreenshot | null;
   /** The issues surfaced in the devtools Issues panel */
@@ -135,9 +142,16 @@ export interface GathererArtifacts extends PublicGathererArtifacts {
   /** Size and compression opportunity information for all the images in the page. */
   OptimizedImages: Array<Artifacts.OptimizedImage | Artifacts.OptimizedImageError>;
   /** Size info of all network records sent without compression and their size after gzipping. */
-  ResponseCompression: {requestId: string, url: string, mimeType: string, transferSize: number, resourceSize: number, gzipSize?: number}[];
+  ResponseCompression: {
+    requestId: string,
+    url: string,
+    mimeType: string,
+    transferSize: number,
+    resourceSize: number,
+    gzipSize?: number
+  }[];
   /** Information on fetching and the content of the /robots.txt file. */
-  RobotsTxt: {status: number|null, content: string|null, errorMessage?: string};
+  RobotsTxt: { status: number | null, content: string | null, errorMessage?: string };
   /** The result of calling the shared trace engine root cause analysis. */
   RootCauses: Artifacts.TraceEngineRootCauses;
   /** Source maps of scripts executed in the page. */
@@ -151,9 +165,9 @@ export interface GathererArtifacts extends PublicGathererArtifacts {
   /** Elements associated with metrics (ie: Largest Contentful Paint element). */
   TraceElements: Artifacts.TraceElement[];
   /** COMPAT: A set of traces, keyed by passName. */
-  traces: {[passName: string]: Trace};
+  traces: { [passName: string]: Trace };
   /** COMPAT: A set of DevTools debugger protocol records, keyed by passName. */
-  devtoolsLogs: {[passName: string]: DevtoolsLog};
+  devtoolsLogs: { [passName: string]: DevtoolsLog };
 }
 
 declare module Artifacts {
@@ -163,7 +177,7 @@ declare module Artifacts {
 
   type NetworkRequest = _NetworkRequest;
   type TaskNode = _TaskNode;
-  type TBTImpactTask = TaskNode & {tbtImpact: number, selfTbtImpact: number, selfBlockingTime: number};
+  type TBTImpactTask = TaskNode & { tbtImpact: number, selfTbtImpact: number, selfBlockingTime: number };
   type MetaElement = Artifacts['MetaElements'][0];
 
   interface URL {
@@ -203,7 +217,7 @@ declare module Artifacts {
     impact?: string;
     tags: Array<string>;
     nodes: Array<{
-      target: Array<string|string[]>;
+      target: Array<string | string[]>;
       failureSummary?: string;
       node: NodeDetails;
       relatedNodes: NodeDetails[];
@@ -234,8 +248,8 @@ declare module Artifacts {
   interface DOMStats {
     /** The total number of elements found within the page's body. */
     totalBodyElements: number;
-    width: NodeDetails & {max: number;};
-    depth: NodeDetails & {max: number;};
+    width: NodeDetails & { max: number; };
+    depth: NodeDetails & { max: number; };
   }
 
   interface IFrameElement {
@@ -261,7 +275,7 @@ declare module Artifacts {
   /** @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/link#Attributes */
   interface LinkElement {
     /** The `rel` attribute of the link, normalized to lower case. @see https://developer.mozilla.org/en-US/docs/Web/HTML/Link_types */
-    rel: 'alternate'|'canonical'|'dns-prefetch'|'preconnect'|'preload'|'stylesheet'|string;
+    rel: 'alternate' | 'canonical' | 'dns-prefetch' | 'preconnect' | 'preload' | 'stylesheet' | string;
     /** The `href` attribute of the link or `null` if it was invalid in the header. */
     href: string | null
     /** The raw value of the `href` attribute. Only different from `href` when source is 'headers' */
@@ -273,13 +287,13 @@ declare module Artifacts {
     /** The `crossOrigin` attribute of the link */
     crossOrigin: string | null
     /** Where the link was found, either in the DOM or in the headers of the main document */
-    source: 'head'|'body'|'headers'
+    source: 'head' | 'body' | 'headers'
     node: NodeDetails | null
     /** The fetch priority hint for preload links. */
     fetchPriority?: string;
   }
 
-  interface Script extends Omit<Crdp.Debugger.ScriptParsedEvent, 'url'|'embedderName'> {
+  interface Script extends Omit<Crdp.Debugger.ScriptParsedEvent, 'url' | 'embedderName'> {
     /**
      * Set by a sourceURL= magic comment if present, otherwise this is the same as the URL.
      * Use this field for presentational purposes only.
@@ -309,8 +323,8 @@ declare module Artifacts {
      * An optional array of maps that are associated with an offset into the generated code.
      * `map` is optional because the spec defines that either `url` or `map` must be defined.
      * We explicitly only support `map` here.
-    */
-    sections?: Array<{offset: {line: number, column: number}, map?: RawSourceMap}>
+     */
+    sections?: Array<{ offset: { line: number, column: number }, map?: RawSourceMap }>
   }
 
   /**
@@ -348,7 +362,7 @@ declare module Artifacts {
       files: Record<string, number>;
       unmappedBytes: number;
       totalBytes: number;
-    } | {errorMessage: string};
+    } | { errorMessage: string };
   }
 
   /** @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#Attributes */
@@ -402,8 +416,8 @@ declare module Artifacts {
       };
       cssRule?: {
         type: 'Regular' | 'Inline' | 'Attributes';
-        range?: {startLine: number, startColumn: number};
-        parentRule?: {origin: Crdp.CSS.StyleSheetOrigin, selectors: {text: string}[]};
+        range?: { startLine: number, startColumn: number };
+        parentRule?: { origin: Crdp.CSS.StyleSheetOrigin, selectors: { text: string }[] };
         styleSheetId?: string;
         stylesheet?: Crdp.CSS.CSSStyleSheetHeader;
         cssProperties?: Array<Crdp.CSS.CSSProperty>;
@@ -502,10 +516,10 @@ declare module Artifacts {
   }
 
   interface TraceElement {
-    traceEventType: 'largest-contentful-paint'|'layout-shift'|'animation'|'responsiveness';
+    traceEventType: 'largest-contentful-paint' | 'layout-shift' | 'animation' | 'responsiveness';
     node: NodeDetails;
     nodeId: number;
-    animations?: {name?: string, failureReasonsMask?: number, unsupportedProperties?: string[]}[];
+    animations?: { name?: string, failureReasonsMask?: number, unsupportedProperties?: string[] }[];
     type?: string;
   }
 
@@ -582,6 +596,7 @@ declare module Artifacts {
   interface Metric {
     timing: number;
     timestamp?: number;
+    avadaScriptData?: Array<object>;
   }
 
   interface NetworkAnalysis {
@@ -626,9 +641,9 @@ declare module Artifacts {
     /** The subset of trace events from the main frame and any child frames, sorted by timestamp. */
     frameTreeEvents: Array<TraceEvent>;
     /** IDs for the trace's main frame, and process. The startingPid is the initial process id, however cross-origin navigations may incur changes to the pid while the frame ID remains identical. */
-    mainFrameInfo: {startingPid: number, frameId: string};
+    mainFrameInfo: { startingPid: number, frameId: string };
     /** The list of frames committed in the trace. */
-    frames: Array<{id: string, url: string}>;
+    frames: Array<{ id: string, url: string }>;
     /** The trace event marking the time at which the run should consider to have begun. Typically the same as the navigationStart but might differ due to SPA navigations, client-side redirects, etc. In the timespan case, this event is injected by Lighthouse itself. */
     timeOriginEvt: TraceEvent;
     /** All received trace events subsetted to important categories. */
@@ -840,12 +855,13 @@ export interface Trace {
   metadata?: {
     'cpu-family'?: number;
   };
+
   [futureProps: string]: any;
 }
 
 /** The type of the Profile & ProfileChunk event in Chromium traces. Note that this is subtly different from Crdp.Profiler.Profile. */
 export interface TraceCpuProfile {
-  nodes?: Array<{id: number, callFrame: {functionName: string, url?: string}, parent?: number}>
+  nodes?: Array<{ id: number, callFrame: { functionName: string, url?: string }, parent?: number }>
   samples?: Array<number>
   timeDeltas?: Array<number>
 }
@@ -915,7 +931,7 @@ export interface TraceEvent {
       unsupportedProperties?: string[];
       size?: number;
       /** Responsiveness data. */
-      interactionType?: 'drag'|'keyboard'|'tapOrClick';
+      interactionType?: 'drag' | 'keyboard' | 'tapOrClick';
       maxDuration?: number;
       type?: string;
       functionName?: string;
@@ -935,7 +951,7 @@ export interface TraceEvent {
       connectionReused?: boolean;
       encodedDataLength?: number;
       decodedBodyLength?: number;
-      initiator?: {type: string, url?: string, stack?: any};
+      initiator?: { type: string, url?: string, stack?: any };
       protocol?: string;
       finishTime?: number;
     };
@@ -948,7 +964,7 @@ export interface TraceEvent {
   /** Timestamp of the event in microseconds. */
   ts: number;
   dur: number;
-  ph: 'B'|'b'|'D'|'E'|'e'|'F'|'I'|'M'|'N'|'n'|'O'|'R'|'S'|'T'|'X';
+  ph: 'B' | 'b' | 'D' | 'E' | 'e' | 'F' | 'I' | 'M' | 'N' | 'n' | 'O' | 'R' | 'S' | 'T' | 'X';
   s?: 't';
   id?: string;
   id2?: {
@@ -977,7 +993,7 @@ declare module Trace {
    * more specific `ph` (if needed).
    */
   interface AsyncEvent {
-    ph: 'b'|'e'|'n';
+    ph: 'b' | 'e' | 'n';
     cat: string;
     pid: number;
     tid: number;

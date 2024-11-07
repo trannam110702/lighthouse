@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as LH from '../../types/lh.js';
 import {isUnderTest} from '../lib/lh-env.js';
 import {Util} from '../../shared/util.js';
 
@@ -16,7 +15,7 @@ const METRIC_SAVINGS_PRECISION = {
   LCP: 50,
   INP: 50,
   TBT: 50,
-  CLS: 0.001,
+  CLS: 0.001
 };
 
 /**
@@ -63,7 +62,7 @@ class Audit {
       MANUAL: 'manual',
       INFORMATIVE: 'informative',
       NOT_APPLICABLE: 'notApplicable',
-      ERROR: 'error',
+      ERROR: 'error'
     };
   }
 
@@ -148,13 +147,13 @@ class Audit {
    */
   static makeTableDetails(headings, results, options = {}) {
     const {wastedBytes, wastedMs, sortedBy, skipSumming, isEntityGrouped} = options;
-    const summary = (wastedBytes || wastedMs) ? {wastedBytes, wastedMs} : undefined;
+    const summary = wastedBytes || wastedMs ? {wastedBytes, wastedMs} : undefined;
     if (results.length === 0) {
       return {
         type: 'table',
         headings: [],
         items: [],
-        summary,
+        summary
       };
     }
 
@@ -167,7 +166,7 @@ class Audit {
       summary,
       sortedBy,
       skipSumming,
-      isEntityGrouped,
+      isEntityGrouped
     };
   }
 
@@ -178,7 +177,7 @@ class Audit {
   static makeListDetails(items) {
     return {
       type: 'list',
-      items: items,
+      items: items
     };
   }
 
@@ -202,7 +201,7 @@ class Audit {
     generalMessages,
     node,
     maxLineLength = 200,
-    maxLinesAroundMessage = 20,
+    maxLinesAroundMessage = 20
   }) {
     const allLines = Audit._makeSnippetLinesArray(content, maxLineLength);
     const lines = Util.filterRelevantLines(allLines, lineMessages, maxLinesAroundMessage);
@@ -213,7 +212,7 @@ class Audit {
       lineMessages,
       generalMessages,
       lineCount: allLines.length,
-      node,
+      node
     };
   }
 
@@ -228,7 +227,7 @@ class Audit {
       /** @type LH.Audit.Details.SnippetValue['lines'][0] */
       const lineDetail = {
         content: Util.truncate(line, maxLineLength),
-        lineNumber,
+        lineNumber
       };
       if (line.length > maxLineLength) {
         lineDetail.truncated = true;
@@ -255,7 +254,7 @@ class Audit {
       overallSavingsBytes,
       sortedBy,
       skipSumming,
-      isEntityGrouped,
+      isEntityGrouped
     };
   }
 
@@ -271,7 +270,7 @@ class Audit {
       selector: node.selector,
       boundingRect: node.boundingRect,
       snippet: node.snippet,
-      nodeLabel: node.nodeLabel,
+      nodeLabel: node.nodeLabel
     };
   }
 
@@ -288,7 +287,7 @@ class Audit {
     return {
       file: entry.sourceURL || '',
       line: entry.sourceLineNumber || 0,
-      column: entry.sourceColumnNumber || 0,
+      column: entry.sourceColumnNumber || 0
     };
   }
 
@@ -306,7 +305,7 @@ class Audit {
       urlProvider: 'network',
       line,
       column,
-      original: bundle && this._findOriginalLocation(bundle, line, column),
+      original: bundle && this._findOriginalLocation(bundle, line, column)
     };
   }
 
@@ -334,9 +333,11 @@ class Audit {
       return 1;
     }
 
-    if (scoreDisplayMode !== Audit.SCORING_MODES.BINARY &&
-        scoreDisplayMode !== Audit.SCORING_MODES.NUMERIC &&
-        scoreDisplayMode !== Audit.SCORING_MODES.METRIC_SAVINGS) {
+    if (
+      scoreDisplayMode !== Audit.SCORING_MODES.BINARY &&
+      scoreDisplayMode !== Audit.SCORING_MODES.NUMERIC &&
+      scoreDisplayMode !== Audit.SCORING_MODES.METRIC_SAVINGS
+    ) {
       return null;
     }
 
@@ -363,7 +364,9 @@ class Audit {
     const normalizedMetricSavings = {...metricSavings};
 
     // eslint-disable-next-line max-len
-    for (const key of /** @type {Array<keyof LH.Audit.ProductMetricSavings>} */ (Object.keys(metricSavings))) {
+    for (const key of /** @type {Array<keyof LH.Audit.ProductMetricSavings>} */ (Object.keys(
+      metricSavings
+    ))) {
       let value = metricSavings[key];
       if (value === undefined) continue;
 
@@ -390,7 +393,7 @@ class Audit {
     return Audit.generateAuditResult(audit, {
       score: null,
       errorMessage,
-      errorStack,
+      errorStack
     });
   }
 
@@ -467,6 +470,7 @@ class Audit {
 
       details: product.details,
       guidanceLevel: audit.meta.guidanceLevel,
+      avadaAdditionalData: product.avadaScriptData
     };
   }
 

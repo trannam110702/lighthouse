@@ -36,21 +36,22 @@ function parseChromeFlags(flags = '') {
   // flags will be an array if there are multiple chrome-flags parameters
   // i.e. `lighthouse --chrome-flags="--user-agent='My Agent'" --chrome-flags="--headless"`
   const trimmedFlags = (Array.isArray(flags) ? flags : [flags])
-      // `child_process.execFile` and other programmatic invocations will pass Lighthouse arguments atomically.
-      // Many developers aren't aware of this and attempt to pass arguments to LH as they would to a shell `--chromeFlags="--headless --no-sandbox"`.
-      // In this case, yargs will see `"--headless --no-sandbox"` and treat it as a single argument instead of the intended `--headless --no-sandbox`.
-      // We remove quotes that surround the entire expression to make this work.
-      // i.e. `child_process.execFile("lighthouse", ["http://google.com", "--chrome-flags='--headless --no-sandbox'")`
-      // the following regular expression removes those wrapping quotes:
-      .map((flagsGroup) => flagsGroup.replace(/^\s*('|")(.+)\1\s*$/, '$2').trim())
-      .join(' ').trim();
+    // `child_process.execFile` and other programmatic invocations will pass Lighthouse arguments atomically.
+    // Many developers aren't aware of this and attempt to pass arguments to LH as they would to a shell `--chromeFlags="--headless --no-sandbox"`.
+    // In this case, yargs will see `"--headless --no-sandbox"` and treat it as a single argument instead of the intended `--headless --no-sandbox`.
+    // We remove quotes that surround the entire expression to make this work.
+    // i.e. `child_process.execFile("lighthouse", ["http://google.com", "--chrome-flags='--headless --no-sandbox'")`
+    // the following regular expression removes those wrapping quotes:
+    .map(flagsGroup => flagsGroup.replace(/^\s*('|")(.+)\1\s*$/, '$2').trim())
+    .join(' ')
+    .trim();
 
   const parsed = yargsParser(trimmedFlags, {
-    configuration: {'camel-case-expansion': false, 'boolean-negation': false},
+    configuration: {'camel-case-expansion': false, 'boolean-negation': false}
   });
 
-  return Object
-      .keys(parsed)
+  return (
+    Object.keys(parsed)
       // Remove unnecessary _ item provided by yargs,
       .filter(key => key !== '_')
       // Avoid '=true', then reintroduce quotes
@@ -60,7 +61,8 @@ function parseChromeFlags(flags = '') {
         // i.e. `lighthouse --chrome-flags="--user-agent='My Agent'"` becomes `chrome "--user-agent=My Agent"`
         // see https://github.com/GoogleChrome/lighthouse/issues/3744
         return `--${key}=${parsed[key]}`;
-      });
+      })
+  );
 }
 
 /**
@@ -75,10 +77,11 @@ function getDebuggableChrome(flags) {
     if (cpus[0].model.includes('Apple')) {
       throw new Error(
         'Launching Chrome on Mac Silicon (arm64) from an x64 Node installation results in ' +
-        'Rosetta translating the Chrome binary, even if Chrome is already arm64. This would ' +
-        'result in huge performance issues. To resolve this, you must run Lighthouse CLI with ' +
-        'a version of Node built for arm64. You should also confirm that your Chrome install ' +
-        'says arm64 in chrome://version');
+          'Rosetta translating the Chrome binary, even if Chrome is already arm64. This would ' +
+          'result in huge performance issues. To resolve this, you must run Lighthouse CLI with ' +
+          'a version of Node built for arm64. You should also confirm that your Chrome install ' +
+          'says arm64 in chrome://version'
+      );
     }
   }
 
@@ -86,7 +89,7 @@ function getDebuggableChrome(flags) {
     port: flags.port,
     ignoreDefaultFlags: flags.chromeIgnoreDefaultFlags,
     chromeFlags: parseChromeFlags(flags.chromeFlags),
-    logLevel: flags.logLevel,
+    logLevel: flags.logLevel
   });
 }
 
@@ -141,15 +144,16 @@ async function saveResults(runnerResult, flags) {
     await assetSaver.saveLanternNetworkData(devtoolsLog, flags.lanternDataOutputPath);
   }
 
-  const shouldSaveResults = flags.auditMode || (flags.gatherMode === flags.auditMode);
+  const shouldSaveResults = flags.auditMode || flags.gatherMode === flags.auditMode;
   if (!shouldSaveResults) return;
   const {lhr, artifacts, report} = runnerResult;
 
   // Use the output path as the prefix for all generated files.
   // If no output path is set, generate a file prefix using the URL and date.
-  const configuredPath = !flags.outputPath || flags.outputPath === 'stdout' ?
-      getLhrFilenamePrefix(lhr) :
-      flags.outputPath.replace(/\.\w{2,4}$/, '');
+  const configuredPath =
+    !flags.outputPath || flags.outputPath === 'stdout'
+      ? getLhrFilenamePrefix(lhr)
+      : flags.outputPath.replace(/\.\w{2,4}$/, '');
   const resolvedPath = path.resolve(cwd, configuredPath);
 
   if (flags.saveAssets) {
@@ -161,7 +165,8 @@ async function saveResults(runnerResult, flags) {
     const output = report[flags.output.indexOf(outputType)];
     let outputPath = `${resolvedPath}.report.${extension}`;
     // If there was only a single output and the user specified an outputPath, force usage of it.
-    if (flags.outputPath && flags.output.length === 1) outputPath = flags.outputPath;
+    // @todo @nam: back this later
+    // if (flags.outputPath && flags.output.length === 1) outputPath = flags.outputPath;
     await Printer.write(output, outputType, outputPath);
 
     if (outputType === Printer.OutputMode[Printer.OutputMode.html]) {
@@ -169,7 +174,10 @@ async function saveResults(runnerResult, flags) {
         open(outputPath, {wait: false});
       } else {
         // eslint-disable-next-line max-len
-        log.log('CLI', 'Protip: Run lighthouse with `--view` to immediately open the HTML report in your browser');
+        log.log(
+          'CLI',
+          'Protip: Run lighthouse with `--view` to immediately open the HTML report in your browser'
+        );
       }
     }
   }
@@ -188,6 +196,7 @@ async function runLighthouse(url, flags, config) {
     launchedChrome?.kill();
     process.exit(1);
   }
+
   process.on('unhandledRejection', handleTheUnhandled);
 
   /** @type {ChromeLauncher.LaunchedChrome|undefined} */
@@ -226,7 +235,7 @@ async function runLighthouse(url, flags, config) {
         name: 'LighthouseError',
         friendlyMessage: runtimeError.message,
         code: runtimeError.code,
-        message: runtimeError.message,
+        message: runtimeError.message
       });
     }
 
@@ -237,8 +246,4 @@ async function runLighthouse(url, flags, config) {
   }
 }
 
-export {
-  parseChromeFlags,
-  saveResults,
-  runLighthouse,
-};
+export {parseChromeFlags, saveResults, runLighthouse};

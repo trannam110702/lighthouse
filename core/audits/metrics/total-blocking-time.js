@@ -10,9 +10,10 @@ import * as i18n from '../../lib/i18n/i18n.js';
 
 const UIStrings = {
   /** Description of the Total Blocking Time (TBT) metric, which calculates the total duration of blocking time for a web page. Blocking times are time periods when the page would be blocked (prevented) from responding to user input (clicks, taps, and keypresses will feel slow to respond). This is displayed within a tooltip when the user hovers on the metric name to see more. No character length limits.*/
-  description: 'Sum of all time periods between FCP and Time to Interactive, ' +
-      'when task length exceeded 50ms, expressed in milliseconds. ' +
-      '[Learn more about the Total Blocking Time metric](https://developer.chrome.com/docs/lighthouse/performance/lighthouse-total-blocking-time/).',
+  description:
+    'Sum of all time periods between FCP and Time to Interactive, ' +
+    'when task length exceeded 50ms, expressed in milliseconds. ' +
+    '[Learn more about the Total Blocking Time metric](https://developer.chrome.com/docs/lighthouse/performance/lighthouse-total-blocking-time/).'
 };
 
 const str_ = i18n.createIcuMessageFn(import.meta.url, UIStrings);
@@ -27,7 +28,7 @@ class TotalBlockingTime extends Audit {
       title: str_(i18n.UIStrings.totalBlockingTimeMetric),
       description: str_(UIStrings.description),
       scoreDisplayMode: Audit.SCORING_MODES.NUMERIC,
-      requiredArtifacts: ['traces', 'devtoolsLogs', 'GatherContext', 'URL'],
+      requiredArtifacts: ['traces', 'devtoolsLogs', 'GatherContext', 'URL']
     };
   }
 
@@ -52,8 +53,8 @@ class TotalBlockingTime extends Audit {
         // See https://www.desmos.com/calculator/pwcgna1cvf go/lh8-tbt-curves
         scoring: {
           p10: 200,
-          median: 600,
-        },
+          median: 600
+        }
       },
       desktop: {
         // Chosen in HTTP Archive desktop results to approximate curve easing described above.
@@ -66,9 +67,9 @@ class TotalBlockingTime extends Audit {
         // )
         scoring: {
           p10: 150,
-          median: 350,
-        },
-      },
+          median: 350
+        }
+      }
     };
   }
 
@@ -88,8 +89,13 @@ class TotalBlockingTime extends Audit {
     const trace = artifacts.traces[Audit.DEFAULT_PASS];
     const devtoolsLog = artifacts.devtoolsLogs[Audit.DEFAULT_PASS];
     const gatherContext = artifacts.GatherContext;
-    const metricComputationData = {trace, devtoolsLog, gatherContext,
-      settings: context.settings, URL: artifacts.URL};
+    const metricComputationData = {
+      trace,
+      devtoolsLog,
+      gatherContext,
+      settings: context.settings,
+      URL: artifacts.URL
+    };
     if (
       gatherContext.gatherMode === 'timespan' &&
       context.settings.throttlingMethod === 'simulate'
@@ -98,19 +104,17 @@ class TotalBlockingTime extends Audit {
     }
 
     const metricResult = await ComputedTBT.request(metricComputationData, context);
+    const {timing, avadaScriptData} = metricResult;
 
     const options = context.options[context.settings.formFactor];
 
-
     return {
-      score: Audit.computeLogNormalScore(
-        options.scoring,
-        metricResult.timing
-      ),
+      score: Audit.computeLogNormalScore(options.scoring, timing),
       scoringOptions: options.scoring,
-      numericValue: metricResult.timing,
+      numericValue: timing,
       numericUnit: 'millisecond',
-      displayValue: str_(i18n.UIStrings.ms, {timeInMs: metricResult.timing}),
+      displayValue: str_(i18n.UIStrings.ms, {timeInMs: timing}),
+      avadaScriptData
     };
   }
 }

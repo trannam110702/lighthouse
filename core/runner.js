@@ -55,7 +55,7 @@ class Runner {
         throw new Error('No audits to evaluate.');
       }
       const auditResultsById = await Runner._runAudits(settings, resolvedConfig.audits, artifacts,
-          lighthouseRunWarnings, computedCache);
+        lighthouseRunWarnings, computedCache);
 
       // LHR construction phase
       const resultsStatus = {msg: 'Generating results...', id: 'lh:runner:generate'};
@@ -86,7 +86,7 @@ class Runner {
       /** @type {LH.Artifacts['FullPageScreenshot']|undefined} */
       let fullPageScreenshot = artifacts.FullPageScreenshot;
       if (resolvedConfig.settings.disableFullPageScreenshot ||
-          fullPageScreenshot instanceof Error) {
+        fullPageScreenshot instanceof Error) {
         fullPageScreenshot = undefined;
       }
 
@@ -259,18 +259,18 @@ class Runner {
       entry,
     ]));
     const timingEntries = Array.from(new Map(timingEntriesKeyValues).values())
-    // Truncate timestamps to hundredths of a millisecond saves ~4KB. No need for microsecond
-    // resolution.
-    .map(entry => {
-      return {
-        // Don't spread entry because browser PerformanceEntries can't be spread.
-        // https://github.com/GoogleChrome/lighthouse/issues/8638
-        startTime: parseFloat(entry.startTime.toFixed(2)),
-        name: entry.name,
-        duration: parseFloat(entry.duration.toFixed(2)),
-        entryType: entry.entryType,
-      };
-    }).sort((a, b) => a.startTime - b.startTime);
+      // Truncate timestamps to hundredths of a millisecond saves ~4KB. No need for microsecond
+      // resolution.
+      .map(entry => {
+        return {
+          // Don't spread entry because browser PerformanceEntries can't be spread.
+          // https://github.com/GoogleChrome/lighthouse/issues/8638
+          startTime: parseFloat(entry.startTime.toFixed(2)),
+          name: entry.name,
+          duration: parseFloat(entry.duration.toFixed(2)),
+          entryType: entry.entryType,
+        };
+      }).sort((a, b) => a.startTime - b.startTime);
     const gatherEntry = timingEntries.find(e => e.name === 'lh:runner:gather');
     const auditEntry = timingEntries.find(e => e.name === 'lh:runner:audit');
     const gatherTiming = gatherEntry?.duration || 0;
@@ -336,7 +336,7 @@ vs
     for (const auditDefn of audits) {
       const auditId = auditDefn.implementation.meta.id;
       const auditResult = await Runner._runAudit(auditDefn, artifacts, sharedAuditContext,
-          runWarnings);
+        runWarnings);
       auditResultsById[auditId] = auditResult;
     }
 
@@ -379,7 +379,7 @@ vs
 
         if (noArtifact || noRequiredTrace || noRequiredDevtoolsLog) {
           log.warn('Runner',
-              `${artifactName} gatherer, required by audit ${audit.meta.id}, did not run.`);
+            `${artifactName} gatherer, required by audit ${audit.meta.id}, did not run.`);
           throw new LighthouseError(
             LighthouseError.errors.MISSING_REQUIRED_ARTIFACT, {artifactName});
         }
@@ -395,7 +395,7 @@ vs
           // Create a friendlier display error and mark it as expected to avoid duplicates in Sentry.
           // The artifact error was already sent to Sentry in `collectPhaseArtifacts`.
           const error = new LighthouseError(LighthouseError.errors.ERRORED_REQUIRED_ARTIFACT,
-              {artifactName, errorMessage: artifactError.message}, {cause: artifactError});
+            {artifactName, errorMessage: artifactError.message}, {cause: artifactError});
           // @ts-expect-error Non-standard property added to Error
           error.expected = true;
           throw error;
@@ -493,11 +493,11 @@ vs
       ...fs.readdirSync(path.join(moduleDir, './audits/seo')).map(f => `seo/${f}`),
       ...fs.readdirSync(path.join(moduleDir, './audits/seo/manual')).map(f => `seo/manual/${f}`),
       ...fs.readdirSync(path.join(moduleDir, './audits/accessibility'))
-          .map(f => `accessibility/${f}`),
+        .map(f => `accessibility/${f}`),
       ...fs.readdirSync(path.join(moduleDir, './audits/accessibility/manual'))
-          .map(f => `accessibility/manual/${f}`),
+        .map(f => `accessibility/manual/${f}`),
       ...fs.readdirSync(path.join(moduleDir, './audits/byte-efficiency'))
-          .map(f => `byte-efficiency/${f}`),
+        .map(f => `byte-efficiency/${f}`),
       ...fs.readdirSync(path.join(moduleDir, './audits/manual')).map(f => `manual/${f}`),
     ];
     return fileList.filter(f => {
@@ -514,7 +514,7 @@ vs
       ...fs.readdirSync(path.join(moduleDir, './gather/gatherers')),
       ...fs.readdirSync(path.join(moduleDir, './gather/gatherers/seo')).map(f => `seo/${f}`),
       ...fs.readdirSync(path.join(moduleDir, './gather/gatherers/dobetterweb'))
-          .map(f => `dobetterweb/${f}`),
+        .map(f => `dobetterweb/${f}`),
     ];
     return fileList.filter(f => /\.js$/.test(f) && f !== 'gatherer.js').sort();
   }

@@ -44,7 +44,7 @@ export interface Result {
   errorStack?: string;
   warnings?: string[];
   /** The scored value of the audit, provided in the range `0-1`, or null if `scoreDisplayMode` indicates not scored. */
-  score: number|null;
+  score: number | null;
   /**
    * A string identifying how the score should be interpreted:
    * - 'binary': pass/fail audit (0 and 1 are only possible scores).
@@ -68,7 +68,7 @@ export interface Result {
   /** Extra information about the page provided by some types of audits, in one of several possible forms that can be rendered in the HTML report. */
   details?: FormattedIcu<AuditDetails>;
   /** Estimates of how much this audit affects various performance metrics. Values will be in the unit of the respective metrics. */
-  metricSavings?: MetricSavings
+  metricSavings?: MetricSavings;
   /** Score details including p10 and median for calculating an audit's log-normal score. */
   scoringOptions?: {
     p10: number;
@@ -76,4 +76,5 @@ export interface Result {
   };
   /** A number indicating how much guidance Lighthouse provides to solve the problem in this audit on a 1-3 scale. Higher means more guidance. */
   guidanceLevel?: number;
+  avadaAdditionalData?: any;
 }

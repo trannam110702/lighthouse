@@ -44,33 +44,28 @@ class TotalBlockingTime extends ComputedMetric {
    */
   static async computeObservedMetric(data, context) {
     const events = TraceProcessor.getMainThreadTopLevelEvents(data.processedTrace);
-
     if (data.processedNavigation) {
       const {firstContentfulPaint} = data.processedNavigation.timings;
       const metricData = ComputedMetric.getMetricComputationInput(data);
       const interactiveTimeMs = (await Interactive.request(metricData, context)).timing;
 
       return {
-        timing: calculateSumOfBlockingTime(
-          events,
-          firstContentfulPaint,
-          interactiveTimeMs
-        ),
+        timing: calculateSumOfBlockingTime(events, firstContentfulPaint, interactiveTimeMs)
       };
     } else {
       return {
-        timing: calculateSumOfBlockingTime(
-          events,
-          0,
-          data.processedTrace.timings.traceEnd
-        ),
+        timing: calculateSumOfBlockingTime(events, 0, data.processedTrace.timings.traceEnd)
       };
     }
   }
 }
 
-const TotalBlockingTimeComputed = makeComputedArtifact(
-  TotalBlockingTime,
-  ['devtoolsLog', 'gatherContext', 'settings', 'simulator', 'trace', 'URL']
-);
+const TotalBlockingTimeComputed = makeComputedArtifact(TotalBlockingTime, [
+  'devtoolsLog',
+  'gatherContext',
+  'settings',
+  'simulator',
+  'trace',
+  'URL'
+]);
 export {TotalBlockingTimeComputed as TotalBlockingTime};
