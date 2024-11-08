@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 import * as Core from '../core/core.js';
 import * as Graph from '../graph/graph.js';
-import {BLOCKING_TIME_THRESHOLD} from "./TBTUtils.js";
+import {BLOCKING_TIME_THRESHOLD, calculateTbtImpactForEvent} from './TBTUtils.js';
 
 class Metric {
   static get coefficients() {
@@ -70,24 +70,35 @@ class Metric {
     const interceptMultiplier = coefficients.intercept > 0 ? Math.min(1, optimisticEstimate.timeInMs / 1000) : 1;
     const timing = coefficients.intercept * interceptMultiplier +
       coefficients.optimistic * optimisticEstimate.timeInMs + coefficients.pessimistic * pessimisticEstimate.timeInMs;
-    const avadaScriptData = metricName === 'TotalBlockingTime' ? this.formatScriptData(this.getTopLevelEvents(pessimisticSimulation.nodeTimings, BLOCKING_TIME_THRESHOLD)) : [];
+    let avadaScriptData = null;
+    if (metricName === 'TotalBlockingTime') {
+      const optimisticFcp = extras.fcpResult.optimisticEstimate.timeInMs;
+      const pessimisticFcp = extras.fcpResult.pessimisticEstimate.timeInMs;
+      const optimisticInteractive = extras.interactiveResult.optimisticEstimate.timeInMs;
+      const pessimisticInteractive = extras.interactiveResult.pessimisticEstimate.timeInMs;
+      const events = this.getTopLevelEvents(pessimisticSimulation.nodeTimings, BLOCKING_TIME_THRESHOLD).map(event => {
+        const optimisticBlockingTime = calculateTbtImpactForEvent(event, optimisticFcp, optimisticInteractive);
+        const pessimisticBlockingTime = calculateTbtImpactForEvent(event, pessimisticFcp, pessimisticInteractive);
+        const blockingTime = coefficients.optimistic * optimisticBlockingTime + coefficients.pessimistic * pessimisticBlockingTime;
+        return {...event, blockingTime};
+      });
+      avadaScriptData = this.formatScriptData(events);
+    }
     return {
       timing,
       avadaScriptData,
       optimisticEstimate,
       pessimisticEstimate,
       optimisticGraph,
-      pessimisticGraph,
+      pessimisticGraph
     };
   }
 
   static formatScriptData(scriptData) {
     return scriptData.reduce((acc, script) => {
       const {evaluateScriptUrls} = script;
-      const formatedScript = {evaluateScriptUrls}
-      formatedScript.blockingTime = script.duration - BLOCKING_TIME_THRESHOLD;
       if (evaluateScriptUrls.length) {
-        acc.push(formatedScript);
+        acc.push(script);
       }
       return acc;
     }, []);
