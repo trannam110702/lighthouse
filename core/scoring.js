@@ -32,7 +32,7 @@ class ReportScoring {
 
         return {
           weight: result.weight + weight,
-          sum: result.sum + /** @type {number} */ (score) * weight,
+          sum: result.sum + /** @type {number} */ (score) * weight
         };
       },
       {weight: 0, sum: 0}
@@ -61,9 +61,11 @@ class ReportScoring {
         // will still be included in the final report json and displayed in the report as
         // "Not Applicable".
         const result = resultsByAuditId[member.id];
-        if (result.scoreDisplayMode === Audit.SCORING_MODES.NOT_APPLICABLE ||
-            result.scoreDisplayMode === Audit.SCORING_MODES.INFORMATIVE ||
-            result.scoreDisplayMode === Audit.SCORING_MODES.MANUAL) {
+        if (
+          result.scoreDisplayMode === Audit.SCORING_MODES.NOT_APPLICABLE ||
+          result.scoreDisplayMode === Audit.SCORING_MODES.INFORMATIVE ||
+          result.scoreDisplayMode === Audit.SCORING_MODES.MANUAL
+        ) {
           member.weight = 0;
         }
 
@@ -72,15 +74,69 @@ class ReportScoring {
 
       const scores = auditRefs.map(auditRef => ({
         score: resultsByAuditId[auditRef.id].score,
-        weight: auditRef.weight,
+        weight: auditRef.weight
       }));
       const score = ReportScoring.arithmeticMean(scores);
-
       scoredCategories[categoryId] = {
         ...configCategory,
         auditRefs,
         id: categoryId,
-        score,
+        score
+      };
+    }
+
+    return scoredCategories;
+  }
+
+  /**
+   * @avada
+   * Returns the report JSON object with computed scores.
+   * @param {Object<string, LH.Config.Category>} configCategories
+   * @param {Object<string, LH.RawIcu<LH.Audit.Result>>} resultsByAuditId
+   * @return {Object<string, LH.RawIcu<LH.Result.Category>>}
+   */
+  static scoreAllCategoriesV2(configCategories, resultsByAuditId) {
+    /** @type {Record<string, LH.RawIcu<LH.Result.Category>>} */
+    const scoredCategories = {};
+
+    for (const [categoryId, configCategory] of Object.entries(configCategories)) {
+      // Copy category audit members
+      const auditRefs = configCategory.auditRefs.map(configMember => {
+        const member = {...configMember};
+
+        // If a result was not applicable, meaning its checks did not run against anything on
+        // the page, force it's weight to 0. It will not count during the arithmeticMean() but
+        // will still be included in the final report json and displayed in the report as
+        // "Not Applicable".
+        const result = resultsByAuditId[member.id];
+        if (!result) return;
+        if (
+          result.scoreDisplayMode === Audit.SCORING_MODES.NOT_APPLICABLE ||
+          result.scoreDisplayMode === Audit.SCORING_MODES.INFORMATIVE ||
+          result.scoreDisplayMode === Audit.SCORING_MODES.MANUAL
+        ) {
+          member.weight = 0;
+        }
+
+        return member;
+      });
+
+      const scores = auditRefs.map(auditRef => {
+        if (!auditRef) return;
+        return {
+          score: Audit.calculateScoreFromTiming(
+            resultsByAuditId[auditRef.id].numericValue,
+            auditRef.id
+          ),
+          weight: auditRef.weight
+        };
+      });
+      const score = ReportScoring.arithmeticMean(scores);
+      scoredCategories[categoryId] = {
+        ...configCategory,
+        auditRefs,
+        id: categoryId,
+        score
       };
     }
 

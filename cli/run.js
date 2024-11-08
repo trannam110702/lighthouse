@@ -166,7 +166,7 @@ async function saveResults(runnerResult, flags) {
     let outputPath = `${resolvedPath}.report.${extension}`;
     // If there was only a single output and the user specified an outputPath, force usage of it.
     // @todo @nam: back this later
-    if (flags.outputPath && flags.output.length === 1) outputPath = flags.outputPath;
+    // if (flags.outputPath && flags.output.length === 1) outputPath = flags.outputPath;
     await Printer.write(output, outputType, outputPath);
 
     if (outputType === Printer.OutputMode[Printer.OutputMode.html]) {

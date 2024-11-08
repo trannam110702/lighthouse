@@ -485,6 +485,16 @@ class Audit {
     const gatherContext = artifacts.GatherContext;
     return {trace, devtoolsLog, gatherContext, settings: context.settings, URL: artifacts.URL};
   }
+
+  /**
+   * @param {number} timing
+   * @param {'mobile' | 'desktop'} device
+   * @returns {number}
+   */
+  static calculateScoreFromTiming(timing, device = 'mobile') {
+    const options = Audit.defaultOptions[device];
+    return Audit.computeLogNormalScore(options.scoring, timing);
+  }
 }
 
 export {Audit};

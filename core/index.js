@@ -116,7 +116,7 @@ function getAuditList() {
 
 async function getAuditScore(auditResults) {
   const {resolvedConfig} = await initializeConfig('navigation');
-  return ReportScoring.scoreAllCategories(resolvedConfig.categories, auditResults);
+  return ReportScoring.scoreAllCategoriesV2(resolvedConfig.categories, auditResults);
 }
 
 const traceCategories = Trace.getDefaultTraceCategories();
