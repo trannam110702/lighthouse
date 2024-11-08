@@ -12,20 +12,20 @@ import {Runner} from '../runner.js';
 import defaultConfig from './default-config.js';
 import {nonSimulatedSettingsOverrides} from './constants.js'; // eslint-disable-line max-len
 import {
-  throwInvalidDependencyOrder,
+  assertValidConfig,
   isValidArtifactDependency,
   throwInvalidArtifactDependency,
-  assertValidConfig,
+  throwInvalidDependencyOrder
 } from './validation.js';
-import {filterConfigByGatherMode, filterConfigByExplicitFilters} from './filters.js';
+import {filterConfigByExplicitFilters, filterConfigByGatherMode} from './filters.js';
 import {
   deepCloneConfigJson,
-  resolveSettings,
-  resolveAuditsToDefns,
-  resolveGathererToDefn,
-  mergePlugins,
   mergeConfigFragment,
   mergeConfigFragmentArrayByKey,
+  mergePlugins,
+  resolveAuditsToDefns,
+  resolveGathererToDefn,
+  resolveSettings
 } from './config-helpers.js';
 import {getModuleDirectory} from '../../shared/esm-utils.js';
 import * as format from '../../shared/localization/format.js';
@@ -44,7 +44,7 @@ const defaultConfigPath = path.join(
  */
 const internalArtifactPriorities = {
   FullPageScreenshot: 1,
-  BFCacheFailures: 1,
+  BFCacheFailures: 1
 };
 
 /**
@@ -70,7 +70,7 @@ function resolveWorkingCopy(config, context) {
   return {
     configWorkingCopy: deepCloneConfigJson(config),
     configPath,
-    configDir,
+    configDir
   };
 }
 
@@ -110,18 +110,18 @@ function resolveArtifactDependencies(artifact, gatherer, artifactDefnsBySymbol) 
   if (!('dependencies' in gatherer.instance.meta)) return undefined;
 
   const dependencies = Object.entries(gatherer.instance.meta.dependencies).map(
-      ([dependencyName, artifactSymbol]) => {
-        const dependency = artifactDefnsBySymbol.get(artifactSymbol);
+    ([dependencyName, artifactSymbol]) => {
+      const dependency = artifactDefnsBySymbol.get(artifactSymbol);
 
-        // Check that dependency was defined before us.
-        if (!dependency) throwInvalidDependencyOrder(artifact.id, dependencyName);
+      // Check that dependency was defined before us.
+      if (!dependency) throwInvalidDependencyOrder(artifact.id, dependencyName);
 
-        // Check that the phase relationship is OK too.
-        const validDependency = isValidArtifactDependency(gatherer, dependency.gatherer);
-        if (!validDependency) throwInvalidArtifactDependency(artifact.id, dependencyName);
+      // Check that the phase relationship is OK too.
+      const validDependency = isValidArtifactDependency(gatherer, dependency.gatherer);
+      if (!validDependency) throwInvalidArtifactDependency(artifact.id, dependencyName);
 
-        return [dependencyName, {id: dependency.id}];
-      }
+      return [dependencyName, {id: dependency.id}];
+    }
   );
 
   return Object.fromEntries(dependencies);
@@ -162,7 +162,7 @@ async function resolveArtifactsToDefns(artifacts, configDir) {
     const artifact = {
       id: artifactJson.id,
       gatherer,
-      dependencies: resolveArtifactDependencies(artifactJson, gatherer, artifactDefnsBySymbol),
+      dependencies: resolveArtifactDependencies(artifactJson, gatherer, artifactDefnsBySymbol)
     };
 
     const symbol = artifact.gatherer.instance.meta.symbol;
@@ -241,7 +241,7 @@ async function initializeConfig(gatherMode, config, flags = {}) {
     audits: await resolveAuditsToDefns(configWorkingCopy.audits, configDir),
     categories: configWorkingCopy.categories || null,
     groups: configWorkingCopy.groups || null,
-    settings,
+    settings
   };
 
   assertValidConfig(resolvedConfig);
@@ -287,8 +287,4 @@ function getConfigDisplayString(resolvedConfig) {
   return JSON.stringify(resolvedConfigCopy, null, 2);
 }
 
-export {
-  resolveWorkingCopy,
-  initializeConfig,
-  getConfigDisplayString,
-};
+export {resolveWorkingCopy, initializeConfig, getConfigDisplayString};

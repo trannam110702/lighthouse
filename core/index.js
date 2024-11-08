@@ -11,6 +11,8 @@ import {ReportGenerator} from '../report/generator/report-generator.js';
 import {startTimespanGather} from './gather/timespan-runner.js';
 import {snapshotGather} from './gather/snapshot-runner.js';
 import {navigationGather} from './gather/navigation-runner.js';
+import {initializeConfig} from './config/config.js';
+import {ReportScoring} from './scoring.js';
 
 /*
  * The relationship between these root modules:
@@ -112,6 +114,11 @@ function getAuditList() {
   return Runner.getAuditList();
 }
 
+async function getAuditScore(auditResults) {
+  const {resolvedConfig} = await initializeConfig('navigation');
+  return ReportScoring.scoreAllCategories(resolvedConfig.categories, auditResults);
+}
+
 const traceCategories = Trace.getDefaultTraceCategories();
 
 export default lighthouse;
@@ -129,5 +136,6 @@ export {
   generateReport,
   auditFlowArtifacts,
   getAuditList,
+  getAuditScore,
   traceCategories
 };
